@@ -1,4 +1,21 @@
 import streamlit as st
+import sqlite3
+import pandas as pd
+
+# Database Connection
+conn = sqlite3.connect("jobs.db", check_same_thread=False)
+cursor = conn.cursor()
+
+# Create Table
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS users(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT,
+    skill TEXT,
+    recommendation TEXT
+)
+""")
+conn.commit()
 
 st.title("Job Recommendation System")
 
@@ -10,11 +27,31 @@ skill = st.selectbox(
 )
 
 if st.button("Get Recommendation"):
+
     if skill == "Python":
-        st.success("Recommended Job: Python Developer")
+        job = "Python Developer"
     elif skill == "Java":
-        st.success("Recommended Job: Java Developer")
+        job = "Java Developer"
     elif skill == "HTML/CSS":
-        st.success("Recommended Job: Web Developer")
-    elif skill == "Data Analytics":
-        st.success("Recommended Job: Data Analyst")
+        job = "Web Developer"
+    else:
+        job = "Data Analyst"
+
+    # Save to Database
+    cursor.execute(
+        "INSERT INTO users(name, skill, recommendation) VALUES (?, ?, ?)",
+        (name, skill, job)
+    )
+    conn.commit()
+
+    st.success(f"Recommended Job: {job}")
+
+# Show Stored Records
+st.subheader("Recommended Candidates")
+
+df = pd.read_sql_query("SELECT * FROM users", conn)
+
+if not df.empty:
+    st.dataframe(df)
+else:
+    st.info("No records found")
