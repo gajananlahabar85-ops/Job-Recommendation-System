@@ -3,19 +3,18 @@ import sqlite3
 import pandas as pd
 
 # Database Connection
-conn = sqlite3.connect("jobs_system.db", check_same_thread=False)
+conn = sqlite3.connect("new_jobs_system.db", check_same_thread=False)
 cursor = conn.cursor()
 
 # User Login Table
-cursor.execute("""
-CREATE TABLE IF NOT EXISTS login (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    username TEXT NOT NULL,
-    password TEXT NOT NULL
-)
-""")
+cursor.execute("SELECT * FROM login")
 
-conn.commit()
+if cursor.fetchone() is None:
+    cursor.execute(
+        "INSERT INTO login(username,password) VALUES (?,?)",
+        ("admin","1234")
+    )
+    conn.commit()
 
 # Recommendation Table
 cursor.execute("""
