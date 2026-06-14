@@ -27,8 +27,8 @@ CREATE TABLE IF NOT EXISTS login (
 conn.commit()
 
 # Insert Default Login
-cursor.execute("SELECT COUNT(*) FROM login")
-count = cursor.fetchone()[0]
+cursor.execute("SELECT * FROM login")
+st.write(cursor.fetchall())
 
 if count == 0:
     cursor.execute(
