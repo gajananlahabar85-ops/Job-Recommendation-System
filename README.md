@@ -1,1 +1,1 @@
-# Job-Recommendation-System
+# AI Job Recommendation System
