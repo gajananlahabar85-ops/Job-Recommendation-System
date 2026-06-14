@@ -50,7 +50,7 @@ CREATE TABLE IF NOT EXISTS users(
 
 conn.commit()
 
-# Reset Default Login
+# Create Default Admin
 cursor.execute("DELETE FROM login")
 
 cursor.execute(
@@ -59,7 +59,6 @@ cursor.execute(
 )
 
 conn.commit()
-
 
 # Login Function
 def check_login(username, password):
