@@ -7,16 +7,38 @@ conn = sqlite3.connect("new_jobs_system.db", check_same_thread=False)
 cursor = conn.cursor()
 
 # User Login Table
-cursor.execute("SELECT * FROM login")
+import streamlit as st
+import sqlite3
+import pandas as pd
 
-if cursor.fetchone() is None:
+# Database
+conn = sqlite3.connect("job_system_new.db", check_same_thread=False)
+cursor = conn.cursor()
+
+# Create Login Table FIRST
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS login (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT,
+    password TEXT
+)
+""")
+
+conn.commit()
+
+# Insert Default Login
+cursor.execute("SELECT COUNT(*) FROM login")
+count = cursor.fetchone()[0]
+
+if count == 0:
     cursor.execute(
         "INSERT INTO login(username,password) VALUES (?,?)",
         ("admin","1234")
     )
     conn.commit()
 
-# Recommendation Table
+
+# Create Recommendation Table
 cursor.execute("""
 CREATE TABLE IF NOT EXISTS users(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -27,7 +49,6 @@ CREATE TABLE IF NOT EXISTS users(
 """)
 
 conn.commit()
-
 # Default Login
 cursor.execute("SELECT * FROM login")
 if cursor.fetchone() is None:
