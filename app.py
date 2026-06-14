@@ -1,148 +1,79 @@
-import streamlit as st
-import sqlite3
+from flask import Flask, render_template, request, redirect, url_for, session
 import pandas as pd
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
 
-# Database Connection
-conn = sqlite3.connect("new_jobs_system.db", check_same_thread=False)
-cursor = conn.cursor()
+app = Flask(__name__)
+app.secret_key = "secret_key_123"
 
-# User Login Table
-import streamlit as st
-import sqlite3
-import pandas as pd
+# Dummy user credentials
+USER = {
+    "username": "admin",
+    "password": "admin123"
+}
 
-# Database
-conn = sqlite3.connect("job_system_new.db", check_same_thread=False)
-cursor = conn.cursor()
+# Sample jobs
+jobs = [
+    {"Job Title": "Data Analyst", "Skills": "Python SQL Excel Power BI"},
+    {"Job Title": "Machine Learning Engineer", "Skills": "Python Machine Learning TensorFlow"},
+    {"Job Title": "Web Developer", "Skills": "HTML CSS JavaScript React"},
+    {"Job Title": "Backend Developer", "Skills": "Python Django Flask SQL"},
+    {"Job Title": "Data Scientist", "Skills": "Python Pandas NumPy Statistics"}
+]
 
-# Create Login Table FIRST
-cursor.execute("""
-CREATE TABLE IF NOT EXISTS login (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    username TEXT,
-    password TEXT
-)
-""")
+@app.route("/")
+def login():
+    return render_template("login.html")
 
-conn.commit()
+@app.route("/login", methods=["POST"])
+def authenticate():
+    username = request.form["username"]
+    password = request.form["password"]
 
-# Insert Default Login
-cursor.execute("SELECT COUNT(*) FROM login")
-count = cursor.fetchone()[0]
+    if username == USER["username"] and password == USER["password"]:
+        session["user"] = username
+        return redirect(url_for("dashboard"))
 
-if count == 0:
-    cursor.execute(
-        "INSERT INTO login(username,password) VALUES (?,?)",
-        ("admin","1234")
-    )
-    conn.commit()
+    return "Invalid Username or Password"
 
-# Create Recommendation Table
-cursor.execute("""
-CREATE TABLE IF NOT EXISTS users(
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT,
-    skill TEXT,
-    recommendation TEXT
-)
-""")
+@app.route("/dashboard")
+def dashboard():
+    if "user" not in session:
+        return redirect(url_for("login"))
 
-conn.commit()
+    return render_template("dashboard.html")
 
-# Create Default Admin
-cursor.execute("DELETE FROM login")
+@app.route("/recommend", methods=["POST"])
+def recommend():
+    if "user" not in session:
+        return redirect(url_for("login"))
 
-cursor.execute(
-    "INSERT INTO login(username,password) VALUES (?,?)",
-    ("admin", "1234")
-)
+    user_skills = request.form["skills"]
 
-conn.commit()
+    df = pd.DataFrame(jobs)
 
-# login function 
-def check_login(username, password):
-    username = username.strip()
-    password = password.strip()
+    docs = df["Skills"].tolist()
+    docs.append(user_skills)
 
-    cursor.execute(
-        "SELECT username, password FROM login WHERE username=? AND password=?",
-        (username, password)
-    )
+    vectorizer = TfidfVectorizer()
+    matrix = vectorizer.fit_transform(docs)
 
-    result = cursor.fetchone()
+    similarity = cosine_similarity(matrix[-1], matrix[:-1])
 
-    return result is not None
-# Session
-if "logged_in" not in st.session_state:
-    st.session_state.logged_in = False
+    df["Score"] = similarity[0]
+    results = df.sort_values(by="Score", ascending=False)
 
+    recommendations = results.to_dict(orient="records")
 
-# Login Page
-if not st.session_state.logged_in:
-
-    st.title("Job Recommendation System Login")
-
-    username = st.text_input("Username")
-    password = st.text_input("Password", type="password")
-
-
-        if st.button("Login"):
-
-    if check_login(username, password):
-        st.session_state.logged_in = True
-        st.success("Login Successful")
-        st.rerun()
-
-    else:
-        st.error("Invalid Login")
-
-# Main Project
-else:
-
-    st.title("Job Recommendation System")
-
-    name = st.text_input("Enter Your Name")
-
-    skill = st.selectbox(
-        "Select Your Skill",
-        ["Python", "Java", "HTML/CSS", "Data Analytics"]
+    return render_template(
+        "recommendations.html",
+        recommendations=recommendations
     )
 
-    if st.button("Get Recommendation"):
+@app.route("/logout")
+def logout():
+    session.pop("user", None)
+    return redirect(url_for("login"))
 
-        if skill == "Python":
-            job = "Python Developer"
-
-        elif skill == "Java":
-            job = "Java Developer"
-
-        elif skill == "HTML/CSS":
-            job = "Web Developer"
-
-        else:
-            job = "Data Analyst"
-
-
-        cursor.execute(
-            "INSERT INTO users(name,skill,recommendation) VALUES (?,?,?)",
-            (name,skill,job)
-        )
-
-        conn.commit()
-
-        st.success(f"Recommended Job: {job}")
-
-
-    st.subheader("Recommended Candidates")
-
-    df = pd.read_sql_query(
-        "SELECT * FROM users",
-        conn
-    )
-
-    st.dataframe(df)
-
-
-    if st.button("Logout"):
-        st.session_state.logged_in = False
-        st.rerun()
+if __name__ == "__main__":
+    app.run(debug=True)
