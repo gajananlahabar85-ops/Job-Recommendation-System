@@ -27,8 +27,8 @@ CREATE TABLE IF NOT EXISTS login (
 conn.commit()
 
 # Insert Default Login
-cursor.execute("SELECT * FROM login")
-st.write(cursor.fetchall())
+cursor.execute("SELECT COUNT(*) FROM login")
+count = cursor.fetchone()[0]
 
 if count == 0:
     cursor.execute(
@@ -36,7 +36,6 @@ if count == 0:
         ("admin","1234")
     )
     conn.commit()
-
 
 # Create Recommendation Table
 cursor.execute("""
