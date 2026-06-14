@@ -59,15 +59,19 @@ cursor.execute(
 
 conn.commit()
 
-# Login Function
+# login function 
 def check_login(username, password):
+    username = username.strip()
+    password = password.strip()
+
     cursor.execute(
-        "SELECT * FROM login WHERE username=? AND password=?",
-        (username,password)
+        "SELECT username, password FROM login WHERE username=? AND password=?",
+        (username, password)
     )
-    return cursor.fetchone()
 
+    result = cursor.fetchone()
 
+    return result is not None
 # Session
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
@@ -81,16 +85,16 @@ if not st.session_state.logged_in:
     username = st.text_input("Username")
     password = st.text_input("Password", type="password")
 
-    if st.button("Login"):
 
-        if check_login(username,password):
-            st.session_state.logged_in = True
-            st.success("Login Successful")
-            st.rerun()
+        if st.button("Login"):
 
-        else:
-            st.error("Invalid Login")
+    if check_login(username, password):
+        st.session_state.logged_in = True
+        st.success("Login Successful")
+        st.rerun()
 
+    else:
+        st.error("Invalid Login")
 
 # Main Project
 else:
