@@ -29,7 +29,7 @@ conn.commit()
 
 # Default Login
 cursor.execute("SELECT * FROM login")
-if cursor.fetchall() is None:
+if cursor.fetchone() is None:
     cursor.execute(
         "INSERT INTO login(username,password) VALUES (?,?)",
         ("admin","1234")
@@ -43,7 +43,7 @@ def check_login(username, password):
         "SELECT * FROM login WHERE username=? AND password=?",
         (username,password)
     )
-    return cursor.fetchall()
+    return cursor.fetchone()
 
 
 # Session
