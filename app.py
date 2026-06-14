@@ -49,14 +49,16 @@ CREATE TABLE IF NOT EXISTS users(
 """)
 
 conn.commit()
-# Default Login
-cursor.execute("SELECT * FROM login")
-if cursor.fetchone() is None:
-    cursor.execute(
-        "INSERT INTO login(username,password) VALUES (?,?)",
-        ("admin","1234")
-    )
-    conn.commit()
+
+# Reset Default Login
+cursor.execute("DELETE FROM login")
+
+cursor.execute(
+    "INSERT INTO login(username,password) VALUES (?,?)",
+    ("admin", "1234")
+)
+
+conn.commit()
 
 
 # Login Function
