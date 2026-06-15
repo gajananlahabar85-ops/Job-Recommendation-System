@@ -1,6 +1,5 @@
-Skill,Job
-Python,Python Developer
-Java,Java Developer
-HTML/CSS,Web Developer
-Data Analytics,Data Analyst
-SQL,Database Administrator
+Job Title,Skills
+Python Developer,Python SQL Machine Learning
+Data Analyst,Python Excel SQL
+Web Developer,HTML CSS JavaScript
+Java Developer,Java OOP SQL
