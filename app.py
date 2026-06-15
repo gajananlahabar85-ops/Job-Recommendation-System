@@ -32,8 +32,8 @@ def login():
             st.error("Invalid Credentials")
 
 def recommend_jobs(user_skills):
-    docs = df["Skills"].tolist()
-    docs.append(user_skills)
+    docs = df["Skill"].tolist()
+    docs.append(user_skill)
 
     vectorizer = TfidfVectorizer()
     matrix = vectorizer.fit_transform(docs)
