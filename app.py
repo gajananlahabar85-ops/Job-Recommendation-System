@@ -31,28 +31,9 @@ def recommend_jobs(user_skill):
 
     df = pd.read_csv("jobs.csv")
 
-    vectorizer = TfidfVectorizer()
+    st.write("CSV Columns:", df.columns)
 
-    skill_vectors = vectorizer.fit_transform(df["Skill"])
-
-    user_vector = vectorizer.transform([user_skill])
-
-    similarity = cosine_similarity(
-        user_vector,
-        skill_vectors
-    )
-
-    scores = similarity[0]
-
-    df["Score"] = scores
-
-    result = df.sort_values(
-        by="Score",
-        ascending=False
-    )
-
-    return result.head(5)
-
+    return df
 
 def dashboard():
 
