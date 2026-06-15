@@ -57,9 +57,8 @@ def dashboard():
 
     job_title = st.text_input("Job Title")
 
-    skills = st.text_input(
-        "Skills (Example: Python, SQL, Excel)"
-    )
+    skills = st.text_input("Skills (Example: Python, SQL, Excel)")
+
 
     if st.button("Recommend Jobs"):
 
@@ -69,11 +68,12 @@ def dashboard():
 
             st.subheader("Recommended Jobs")
 
-           st.dataframe(
-    result[["Job Title", "Skills", "Match Score"]]
-)
+            st.dataframe(
+                result[["Job Title", "Skills", "Match Score"]]
+            )
+
         else:
-            st.warning("Enter your skills")
+            st.warning("Please enter skills")
 
 # ---------------- MAIN ----------------
 
