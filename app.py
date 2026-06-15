@@ -11,7 +11,9 @@ st.set_page_config(
 )
 
 # Load Dataset
+df = pd.read_csv("jobs.csv")
 st.write(df.columns)
+
 # Simple Login
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
