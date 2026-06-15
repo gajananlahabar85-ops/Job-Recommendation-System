@@ -45,7 +45,6 @@ def dashboard():
         "Skills (Example: Python, SQL, Excel)"
     )
 
-
     if st.button("Recommend Jobs"):
 
         if skills:
@@ -54,13 +53,10 @@ def dashboard():
 
             st.subheader("Recommended Jobs")
 
-           st.dataframe(
-    result[["Job Title","Skills"]]
-            )
+            st.dataframe(result)
 
         else:
             st.warning("Enter your skills")
-
 
 # ---------------- MAIN ----------------
 
