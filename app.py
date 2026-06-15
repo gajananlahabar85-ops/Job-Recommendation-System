@@ -54,8 +54,8 @@ def dashboard():
 
             st.subheader("Recommended Jobs")
 
-            st.dataframe(
-                result[["Job Title","Skill"]]
+           st.dataframe(
+    result[["Job Title","Skills"]]
             )
 
         else:
